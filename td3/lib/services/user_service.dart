@@ -1,6 +1,10 @@
 import '../models/user.dart';
 
 class UserService {
+
+  User? _currentUser;
+  User? get currentUser => _currentUser;
+
   // Crear instancia única
   static final UserService _instance = UserService._internal();
 
@@ -22,7 +26,6 @@ class UserService {
     _registeredUsers.add(User(email: email, password: password));
     return null;
   }
-
   String? login(String email, String password) {
     final user = _registeredUsers.firstWhere(
       (user) => user.email == email && user.password == password,
@@ -32,6 +35,13 @@ class UserService {
     if (user.email.isEmpty) {
       return 'Usuario o contraseña incorrectos';
     }
+
+    _currentUser = user; // ✅ Guardar usuario activo
     return null;
   }
+  void logout() {
+  _currentUser = null;
+  } 
+
 }
+

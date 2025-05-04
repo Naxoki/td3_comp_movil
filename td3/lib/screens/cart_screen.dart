@@ -67,52 +67,42 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final cartItems = _cartService.items;
 
-    return Scaffold(
-      body: cartItems.isEmpty
-          ? Center(child: Text('El carrito está vacío'))
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: cartItems.length,
-                    itemBuilder: (context, index) {
-                      final item = cartItems[index];
-                      return Card(
-                        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        child: ListTile(
-                          leading: Image.network(
-                            item.product.imageUrl,
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(Icons.image_not_supported);
-                            },
-                          ),
-                          title: Text(item.product.name),
-                          subtitle: Text('Cantidad: ${item.quantity}\nStock disponible: ${item.product.stock}'),
-                          trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _removeItem(item),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: ElevatedButton.icon(
-                    onPressed: _purchase,
-                    icon: Icon(Icons.payment),
-                    label: Text('Comprar Todo'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: Size(double.infinity, 50), // Botón grande
+      return cartItems.isEmpty
+    ? Center(child: Text('El carrito está vacío'))
+    : Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                final item = cartItems[index];
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: ListTile(
+                    title: Text(item.product.name),
+                    subtitle: Text('Cantidad: ${item.quantity}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _removeItem(item),
                     ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
-    );
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton.icon(
+              onPressed: _purchase,
+              icon: Icon(Icons.payment),
+              label: Text('Comprar'),
+              style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 50)),
+            ),
+          ),
+        ],
+      );
+
+
   }
+  
 }

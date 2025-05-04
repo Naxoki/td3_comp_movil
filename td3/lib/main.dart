@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-// pantallas
-import 'screens/home_screen.dart';
-import 'screens/category_screen.dart';
-import 'screens/cart_screen.dart';
-import 'screens/profile_screen.dart';
+// Importa tus pantallas
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/cart_screen.dart';
+import 'screens/category_screen.dart';
+import 'screens/profile_screen.dart';
+
 import 'widgets/top_bar.dart';
 import 'widgets/bottom_nav_bar.dart';
 
@@ -20,14 +21,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tienda Flutter',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: LoginScreen(), // Empezamos desde Login
+      theme: ThemeData(primarySwatch: Colors.blue),
+      initialRoute: '/login',
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
-        '/home': (context) => MainApp(), // MainApp incluye el BottomNavigationBar
+        '/home': (context) => MainApp(),
+        '/category': (context) => CategoryScreen(),
+        '/cart': (context) => CartScreen(),
+        '/profile': (context) => ProfileScreen(),
       },
     );
   }
@@ -40,19 +42,27 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   int _currentIndex = 0;
+
   final TextEditingController _searchController = TextEditingController();
 
-  late List<Widget> _screens;
+  // Solo las pantallas que se quedan dentro del MainApp (sin barras duplicadas)
+  final List<Widget> _screens = [
+    HomeScreen(searchController: TextEditingController()),
+    CategoryScreen(),                                       // index 0
+    CartScreen(),                                           // index 1
+    ProfileScreen(),                                        // index 2
+  ];
 
-  @override
-  void initState() {
-    super.initState();
-    _screens = [
-      HomeScreen(searchController: _searchController),
-      CategoryScreen(),
-      CartScreen(),
-      ProfileScreen(),
-    ];
+  void _onTap(int index) {
+    if (index == 1) {
+      // Ir a categorías mediante ruta externa
+      Navigator.pushReplacementNamed(context, '/category');
+      return;
+    }
+
+    setState(() {
+      _currentIndex = index > 1 ? index - 1 : index;
+    });
   }
 
   @override
@@ -60,19 +70,12 @@ class _MainAppState extends State<MainApp> {
     return Scaffold(
       appBar: TopBar(
         searchController: _searchController,
-        onSearchChanged: (value) {
-          // Puedes usar Provider, o setState si el widget lo admite
-        },
+        onSearchChanged: (query) {}, // opcional, si Home usa esto
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-            _searchController.clear();
-          });
-        },
+        currentIndex: _currentIndex == 0 ? 0 : _currentIndex + 1, // para que se mantenga el índice correcto
+        onTap: _onTap,
       ),
     );
   }
